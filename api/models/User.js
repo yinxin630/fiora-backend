@@ -10,11 +10,14 @@ module.exports = {
     attributes: {
         username: {
             type: 'string',
+            unique: true,
         },
         
         password: {
             type: 'string',
         }
-    }
+    },
+    
+    salt: '$2a$10$VkiMsLCxC8yPcSXKLNuqqe',
 };
 
