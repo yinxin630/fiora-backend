@@ -10,6 +10,7 @@ module.exports = {
     attributes: {
         token: {
             type: 'string',
+            unique: true,
         },
         
         expiry: {

@@ -18,7 +18,7 @@ module.exports = function serverError (data, options) {
   res.status(500);
   
   // Log request 
-  sails.log(`get ${req.path} ${res.statusCode} ${new Date - req.time}ms`);
+  sails.log(`get ${req.url} ${res.statusCode} ${new Date - req.time}ms`);
     
   return res.jsonx(data);
 };
