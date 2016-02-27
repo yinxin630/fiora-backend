@@ -19,8 +19,7 @@ module.exports = function sendOK (data, options) {
   res.status(201);
   
   // Log request 
-  var now = new Date;
-  sails.log(`get ${req.path} ${res.statusCode} ${now - req.time}ms`);
+  sails.log(`get ${req.path} ${res.statusCode} ${new Date - req.time}ms`);
 
   return res.jsonx(data);
 };
