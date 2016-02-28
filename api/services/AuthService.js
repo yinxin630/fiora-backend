@@ -13,7 +13,8 @@ module.exports = {
             if (option.token) {
                 let auth = yield Auth.findOne({token: option.token});
                 
-                if (auth && auth.expiry < new Date().getTime()) {
+                if (auth && auth.expiry > new Date().getTime()) {
+                    sails.log('token 有效');
                     return res.created(auth);
                 }
             }
@@ -23,9 +24,15 @@ module.exports = {
             
             let user = yield User.findOne({username: option.username});
             Assert(user, res, 400, `user '${option.username}' not exists`);
+            
             Assert(Bcrypt.compareSync(option.password, user.password), res, 400, `password not correct`);
             
-            let expiry = new Date().getTime() + 60 * 60 * 24;
+            let loggedAuth = yield Auth.findOne({user: user.id});
+            if (loggedAuth) {
+                return res.created(loggedAuth);
+            }
+            
+            let expiry = new Date().getTime() + (60 * 60 * 24);
             const token = Crypto.createHmac('sha256', secret).update(option.username + expiry).digest('hex');
             
             let newAuth = yield Auth.create({user: user.id, token: token, expiry: expiry, socket: option.socket.id});

@@ -10,7 +10,7 @@ module.exports = {
 	create: function (req, res) {
         let username = req.param('username');
         let password = req.param('password');
-        let token = req.headers.Authorization;
+        let token = req.param('token');
         let socket = req.socket;
         
         AuthService.create({
