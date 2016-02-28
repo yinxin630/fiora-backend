@@ -34,9 +34,9 @@ module.exports = {
     },
     
     destroy: function (req, res) {
-        let token = req.headers.Authorization;
+        let token = req.headers.authorization;
         
-        AuthService.destrop({
+        AuthService.destroy({
             token: token,
         }, res);
     }
