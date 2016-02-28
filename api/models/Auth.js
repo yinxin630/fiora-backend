@@ -10,10 +10,16 @@ module.exports = {
     attributes: {
         user: {
             model: 'user',
+            unique: true,
         },
         
         token: {
-            model: 'token',
+            type: 'string',
+            unique: true,
+        },
+        
+        expiry: {
+            type: 'integer',
         },
         
         socket: {

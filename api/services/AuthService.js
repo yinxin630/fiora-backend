@@ -11,10 +11,10 @@ module.exports = {
     create: function (option, res) {
         Co(function* () {
             if (option.token) {
-                let token = yield Token.findOne({token: option.token});
+                let auth = yield Auth.findOne({token: option.token});
                 
-                if (token && token.expiry < new Date().getTime()) {
-                    return res.created(token);
+                if (auth && auth.expiry < new Date().getTime()) {
+                    return res.created(auth);
                 }
             }
             
@@ -27,13 +27,11 @@ module.exports = {
             
             let expiry = new Date().getTime() + 60 * 60 * 24;
             const token = Crypto.createHmac('sha256', secret).update(option.username + expiry).digest('hex');
-            let newToken = yield Token.create({token: token, expiry: expiry});
-            Assert(newToken, res, 500, 'create token fail');
             
-            let newAuth = yield Auth.create({user: user.id, token: newToken, socket: option.socket.id});
+            let newAuth = yield Auth.create({user: user.id, token: token, expiry: expiry, socket: option.socket.id});
             Assert(newAuth, res, 500, 'login fail');
             
-            res.created(newToken);
+            res.created(newAuth);
         }).catch(err => {
             sails.log.error(err.message);
         });
