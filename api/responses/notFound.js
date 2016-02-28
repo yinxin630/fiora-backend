@@ -6,6 +6,7 @@
  * return res.notFound(err);
  *
  */
+const LogRequest = require('../utils/logRequest.js');
 
 module.exports = function notFound (data, options) {
 
@@ -18,7 +19,7 @@ module.exports = function notFound (data, options) {
   res.status(404);
 
   // Log request 
-  sails.log(`get ${req.path} ${res.statusCode} ${new Date - req.time}ms`);
+  LogRequest(req, res);
   
   return res.jsonx(data);
 };

@@ -6,6 +6,7 @@
  * return res.serverError(err);
  *
  */
+const LogRequest = require('../utils/logRequest.js');
 
 module.exports = function serverError (data, options) {
 
@@ -18,7 +19,7 @@ module.exports = function serverError (data, options) {
   res.status(500);
   
   // Log request 
-  sails.log(`get ${req.url} ${res.statusCode} ${new Date - req.time}ms`);
+  LogRequest(req, res);
     
   return res.jsonx(data);
 };

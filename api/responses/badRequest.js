@@ -6,6 +6,7 @@
  * return res.badRequest(data);
  *
  */
+const LogRequest = require('../utils/logRequest.js');
 
 module.exports = function badRequest(data, options) {
 
@@ -18,7 +19,7 @@ module.exports = function badRequest(data, options) {
   res.status(400);
 
   // Log request 
-  sails.log(`get ${req.path} ${res.statusCode} ${new Date - req.time}ms`);
+  LogRequest(req, res);
 
   return res.jsonx(data);
 };

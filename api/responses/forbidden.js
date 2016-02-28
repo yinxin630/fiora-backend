@@ -10,6 +10,7 @@
  * return res.forbidden('Access denied.');
  * ```
  */
+const LogRequest = require('../utils/logRequest.js');
 
 module.exports = function forbidden (data, options) {
 
@@ -22,7 +23,7 @@ module.exports = function forbidden (data, options) {
   res.status(403);
   
   // Log request 
-  sails.log(`get ${req.path} ${res.statusCode} ${new Date - req.time}ms`);
+  LogRequest(req, res);
 
   return res.jsonx(data);
 };

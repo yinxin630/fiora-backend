@@ -7,6 +7,7 @@
  *
  * @param  {Object} data
  */
+const LogRequest = require('../utils/logRequest.js');
 
 module.exports = function sendOK (data, options) {
 
@@ -19,7 +20,7 @@ module.exports = function sendOK (data, options) {
   res.status(201);
   
   // Log request 
-  sails.log(`get ${req.url} ${res.statusCode} ${new Date - req.time}ms`);
+  LogRequest(req, res);
 
   return res.jsonx(data);
 };
