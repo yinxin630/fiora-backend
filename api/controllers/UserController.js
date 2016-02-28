@@ -15,6 +15,22 @@ module.exports = {
             username: username,
             password: password,
         }, res);
+    },
+    
+    find: function (req, res) {
+        res.notImplement();
+    },
+    
+    findOne: function (req, res) {
+        res.notImplement();
+    },
+    
+    update: function (req, res) {
+        res.notImplement();
+    },
+    
+    destroy: function (req, res) {
+        res.notImplement();
     }
 };
 
