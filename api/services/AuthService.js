@@ -35,5 +35,18 @@ module.exports = {
         }).catch(err => {
             sails.log.error(err.message);
         });
+    },
+    
+    destroy: function (option, res) {
+        Co(function* () {
+            Assert(option.token, res, 400, 'missing token');
+            
+            let auth = yield Auth.destroy({token: option.token});
+            Assert(auth, res, 400, 'please login first');
+            
+            res.deleted();
+        }).catch(err => {
+            sails.log.error(err.message);
+        });
     }
 }

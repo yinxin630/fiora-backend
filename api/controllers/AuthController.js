@@ -34,7 +34,11 @@ module.exports = {
     },
     
     destroy: function (req, res) {
-        res.notImplement();
+        let token = req.headers.Authorization;
+        
+        AuthService.destrop({
+            token: token,
+        }, res);
     }
 };
 
