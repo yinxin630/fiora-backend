@@ -22,7 +22,11 @@ module.exports = {
     },
     
 	find: function (req, res) {
-        res.notImplement();
+        let token = req.param('token');
+        
+        AuthService.find({
+            token: token,
+        }, res);
     },
     
     findOne: function (req, res) {
@@ -34,7 +38,7 @@ module.exports = {
     },
     
     destroy: function (req, res) {
-        let token = req.headers.authorization;
+        let token = req.param('token');
         
         AuthService.destroy({
             token: token,
