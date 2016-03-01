@@ -32,7 +32,7 @@ module.exports = {
                 return res.created(loggedAuth);
             }
             
-            let expiry = new Date().getTime() + (60 * 60 * 24);
+            let expiry = new Date().getTime() + (1000 * 60 * 60 * 24);
             const token = Crypto.createHmac('sha256', secret).update(option.username + expiry).digest('hex');
             
             let newAuth = yield Auth.create({user: user.id, token: token, expiry: expiry, socket: option.socket.id});
