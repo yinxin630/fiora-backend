@@ -10,7 +10,12 @@
  */
 
 module.exports.bootstrap = function(cb) {
-
+    setInterval(() => {
+        Auth.destroy({expiry: {'<': new Date().getTime()}}).then(result => {
+            sails.log('清理过期token:', result);
+        });
+    }, 300000);
+    
   // It's very important to trigger this callback method when you are finished
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
   cb();
