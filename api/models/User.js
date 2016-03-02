@@ -15,6 +15,22 @@ module.exports = {
         
         password: {
             type: 'string',
+        },
+        
+        nickname: {
+            type: 'string',
+        },
+        
+        avatar: {
+            type: 'string',
+        },
+        
+        messages: {
+            collection: 'message',
+        },
+        
+        group: {
+            collection: 'group',
         }
     },
     

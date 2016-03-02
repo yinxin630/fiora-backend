@@ -7,7 +7,7 @@ module.exports = function notImplement (data, options) {
   var res = this.res;
   var sails = req._sails;
 
-  res.status(400);
+  res.status(404);
 
   // Log request 
   LogRequest(req, res);
