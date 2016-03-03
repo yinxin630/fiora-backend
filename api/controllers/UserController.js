@@ -30,7 +30,15 @@ module.exports = {
     },
     
     update: function (req, res) {
-        res.notImplement();
+        let userId = req.user;
+        let nickname = req.param('nickname');
+        let avatar = req.param('avatar');
+        
+        UserService.update({
+            userId: userId,
+            nickname: nickname,
+            avatar: avatar,
+        }, res);
     },
     
     destroy: function (req, res) {

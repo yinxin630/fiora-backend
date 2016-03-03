@@ -37,5 +37,21 @@ module.exports = {
         }).catch(err => {
             sails.log.err(err.message);
         });
+    },
+    
+    update: function (option, res) {
+        Co(function* () {
+            let user = yield User.findOne({id: option.userId});
+            if (option.nickname && option.nickname !== '') {
+                user.nickname = option.nickname;
+            }
+            if (option.avatar && option.avatar !== '') {
+                user.avatar = option.avatar;
+            }
+            let newUser = yield user.save();
+            res.ok(newUser);
+        }).catch(err => {
+            sails.log.err(err.message);
+        });
     }
 }
