@@ -18,7 +18,11 @@ module.exports = {
     },
     
     find: function (req, res) {
-        res.notImplement();
+        let userId = req.user;
+        
+        UserService.find({
+            userId: userId,
+        }, res);
     },
     
     findOne: function (req, res) {

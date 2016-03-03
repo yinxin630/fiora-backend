@@ -9,11 +9,12 @@ module.exports = function(req, res, next) {
             return res.badRequest({msg: 'please login first'});
         }
         
-        let auth = Auth.findOne({token: token});
+        let auth = yield Auth.findOne({token: token});
         if (!auth) {
             return res.badRequest({msg: 'please login first'});
         }
         
+        req.user = auth.user;
         next();
     }).catch(err => {
         sails.log.error(err);
