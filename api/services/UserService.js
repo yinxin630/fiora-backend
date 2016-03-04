@@ -33,7 +33,8 @@ module.exports = {
         Co(function* () {
             let user = yield User.findOne({id: option.userId}).populate('groups').populate('linkmans');
             for (let group of user.groups) {
-                group.messages = yield Message.find({sort: 'updatedAt DESC'}).populate('from').populate('toGroup').limit(20);
+                let count = yield Message.count();
+                group.messages = yield Message.find({skip: count - 30}).populate('from').populate('toGroup');
             }
             
             for (let room of user.groups) {
