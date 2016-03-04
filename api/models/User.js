@@ -29,7 +29,7 @@ module.exports = {
             collection: 'message',
         },
         
-        group: {
+        groups: {
             collection: 'group',
         }
     },

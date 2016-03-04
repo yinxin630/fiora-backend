@@ -21,6 +21,7 @@ module.exports = {
         let userId = req.user;
         
         UserService.find({
+            req: req,
             userId: userId,
         }, res);
     },

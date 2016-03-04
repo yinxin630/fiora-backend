@@ -16,6 +16,10 @@ module.exports = {
             model: 'user',
         },
         
+        isToGroup: {
+            type: 'boolean',
+        },
+        
         time: {
             type: 'datetime',
         },

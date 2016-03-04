@@ -11,15 +11,13 @@ module.exports = {
             Assert(option.password, res, 400, 'missing password param');
             
             let defaultGroup = yield Group.find({}).limit(1);
-            let groups = [];
-            groups.push(defaultGroup);
             let passwordHash = Bcrypt.hashSync(option.password, User.salt);
             let savedUser = yield User.create({
                 username: option.username,
                 password: passwordHash,
                 nickname: sails.config.nickname,
                 avatar: sails.config.avatar,
-                group: groups,
+                groups: [defaultGroup],
             });
             res.created(savedUser);
         }).catch(err => {
@@ -32,7 +30,16 @@ module.exports = {
     
     find: function (option, res) {
         Co(function* () {
-            let user = yield User.findOne({id: option.userId}).populate('group');
+            let user = yield User.findOne({id: option.userId}).populate('groups');
+            
+            for (let room of user.groups) {
+                sails.sockets.join(option.req, room.id, err => {
+                    if (err) {
+                        sails.log('加入房间失败 option:', option);
+                    }
+                });
+            }
+            
             res.ok(user);
         }).catch(err => {
             sails.log.err(err.message);
