@@ -11,6 +11,10 @@ module.exports = {
         name: {
             type: 'string',
         },
+        
+        avatar: {
+            type: 'string',
+        }
     }
 };
 

@@ -17,6 +17,7 @@ module.exports = {
                 password: passwordHash,
                 nickname: sails.config.nickname,
                 avatar: sails.config.avatar,
+                linkmans: [],
                 groups: [defaultGroup],
             });
             res.created(savedUser);
@@ -30,7 +31,10 @@ module.exports = {
     
     find: function (option, res) {
         Co(function* () {
-            let user = yield User.findOne({id: option.userId}).populate('groups');
+            let user = yield User.findOne({id: option.userId}).populate('groups').populate('linkmans');
+            for (let group of user.groups) {
+                group.messages = yield Message.find({sort: 'updatedAt DESC'}).populate('from').populate('toGroup').limit(20);
+            }
             
             for (let room of user.groups) {
                 sails.sockets.join(option.req, room.id, err => {

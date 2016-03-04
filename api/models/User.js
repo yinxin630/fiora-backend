@@ -25,8 +25,8 @@ module.exports = {
             type: 'string',
         },
         
-        messages: {
-            collection: 'message',
+        linkmans: {
+            collection: 'user',
         },
         
         groups: {

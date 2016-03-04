@@ -12,12 +12,12 @@ module.exports = {
             model: 'user',
         },
         
-        to: {
+        toUser: {
             model: 'user',
         },
         
-        isToGroup: {
-            type: 'boolean',
+        toGroup: {
+            model: 'group',
         },
         
         time: {

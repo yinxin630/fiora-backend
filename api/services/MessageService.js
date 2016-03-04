@@ -11,8 +11,17 @@ module.exports = {
             Assert(option.isToGroup, res, 400, 'missing isToGroup param');
             Assert(option.content, res, 400, 'missing content param');
             
-            sails.sockets.broadcast(option.to, 'message', option);
-            res.ok(option);
+            let message = yield Message.create({
+                from: option.from,
+                toGroup: option.to,
+                time: new Date,
+                content: option.content,
+            });
+            
+            let messageResult = yield Message.findOne(message).populate('from').populate('toGroup');
+            sails.sockets.broadcast(option.to, 'message', messageResult);
+            
+            res.ok(messageResult);
         }).catch(err => {
             sails.log(err.message);
         });
