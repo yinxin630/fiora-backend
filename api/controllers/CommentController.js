@@ -18,7 +18,7 @@ module.exports = {
     },
     
     find: function (req, res) {
-        res.notImplement();
+        CommentService.find({}, res);
     },
     
     findOne: function (req, res) {

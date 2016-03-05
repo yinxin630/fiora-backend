@@ -19,5 +19,14 @@ module.exports = {
         }).catch(err => {
             sails.log.err(err);
         })
+    },
+    
+    find: function (option, res) {
+        Co(function* () {
+            let comments = yield Comment.find({sort: 'createdAt DESC'}).populate('from').limit(30);
+            res.ok(comments);
+        }).catch(err => {
+            sails.log.err(err);
+        })
     }
 }
