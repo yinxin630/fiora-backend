@@ -60,6 +60,7 @@ module.exports = {
             if (option.avatar && option.avatar !== '') {
                 user.avatar = option.avatar;
             }
+            user.nickname = user.nickname.slice(0, 8);
             let newUser = yield user.save();
             res.ok(newUser);
         }).catch(err => {
