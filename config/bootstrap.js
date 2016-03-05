@@ -10,7 +10,24 @@
  */
 
 module.exports.bootstrap = function(cb) {
-
+    setInterval(() => {
+        Auth.destroy({expiry: {'<': new Date().getTime()}}).then(result => {
+            sails.log('清理过期token:', result);
+        });
+    }, 300000);
+    
+    Group.find({}).then(result => {
+        if (result.length !== 0) {
+            return;
+        }
+        Group.create({name: '吐槽星人吐槽群', avatar: sails.config.avatar}).then(result => {
+            if (result) {
+                return sails.log('创建默认房间:', result);
+            }
+            return sails.log('创建默认房间失败');
+        });
+    });
+    
   // It's very important to trigger this callback method when you are finished
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
   cb();

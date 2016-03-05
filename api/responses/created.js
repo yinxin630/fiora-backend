@@ -1,9 +1,9 @@
 /**
- * 200 (OK) Response
+ * 201 (Created) Response
  *
  * Usage:
- * return res.ok();
- * return res.ok(data);
+ * return res.created();
+ * return res.created(data);
  *
  * @param  {Object} data
  */
@@ -17,10 +17,10 @@ module.exports = function sendOK (data, options) {
   var sails = req._sails;
 
   // Set status code
-  res.status(200);
-
+  res.status(201);
+  
   // Log request 
   LogRequest(req, res);
-  
+
   return res.jsonx(data);
 };

@@ -10,11 +10,30 @@ module.exports = {
     attributes: {
         username: {
             type: 'string',
+            unique: true,
         },
         
         password: {
             type: 'string',
+        },
+        
+        nickname: {
+            type: 'string',
+        },
+        
+        avatar: {
+            type: 'string',
+        },
+        
+        linkmans: {
+            collection: 'user',
+        },
+        
+        groups: {
+            collection: 'group',
         }
-    }
+    },
+    
+    salt: '$2a$10$VkiMsLCxC8yPcSXKLNuqqe',
 };
 

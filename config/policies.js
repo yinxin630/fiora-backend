@@ -26,7 +26,16 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  // '*': true,
+  '*': ['log', 'isSocket', 'updateExpiry'],
+  
+  AuthController: {
+      destroy: ['log', 'isSocket', 'updateExpiry', 'isLogin'],
+  },
+  
+  UserController: {
+      find: ['log', 'isSocket', 'updateExpiry', 'isLogin'],
+      update: ['log', 'isSocket', 'updateExpiry', 'isLogin'],
+  }
 
   /***************************************************************************
   *                                                                          *
