@@ -15,7 +15,7 @@ module.exports = {
             let savedUser = yield User.create({
                 username: option.username,
                 password: passwordHash,
-                nickname: sails.config.nickname,
+                nickname: option.username,
                 avatar: sails.config.avatar,
                 linkmans: [],
                 groups: [defaultGroup],
