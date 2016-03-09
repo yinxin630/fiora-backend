@@ -11,6 +11,8 @@ module.exports = {
             Assert(option.isToGroup, res, 400, 'missing isToGroup param');
             Assert(option.content, res, 400, 'missing content param');
             
+            option.content = option.content.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
+            
             let message = yield Message.create({
                 from: option.from,
                 toGroup: option.to,
