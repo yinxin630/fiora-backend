@@ -12,7 +12,7 @@ module.exports = {
             
             let defaultGroup = yield Group.find({}).limit(1);
             let passwordHash = Bcrypt.hashSync(option.password, User.salt);
-            let savedUser = yield User.create({
+            let user = yield User.create({
                 username: option.username,
                 password: passwordHash,
                 nickname: option.username,
@@ -20,7 +20,9 @@ module.exports = {
                 linkmans: [],
                 groups: [defaultGroup],
             });
-            res.created(savedUser);
+            
+            delete user.password;
+            res.created(user);
         }).catch(err => {
             sails.log.error(err.message);
             
@@ -32,9 +34,13 @@ module.exports = {
     find: function (option, res) {
         Co(function* () {
             let user = yield User.findOne({id: option.userId}).populate('groups').populate('linkmans');
+            delete user.password;
             for (let group of user.groups) {
                 let count = yield Message.count();
                 group.messages = yield Message.find({skip: count - 30}).populate('from').populate('toGroup');
+                for (let m of group.messages) {
+                    delete m.from.password;
+                }
             }
             
             for (let room of user.groups) {
@@ -60,8 +66,10 @@ module.exports = {
             if (option.avatar && option.avatar !== '') {
                 user.avatar = option.avatar;
             }
+            
             user.nickname = user.nickname.slice(0, 8);
             let newUser = yield user.save();
+            delete newUser.password;
             res.ok(newUser);
         }).catch(err => {
             sails.log.err(err.message);
