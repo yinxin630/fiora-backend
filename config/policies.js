@@ -16,6 +16,8 @@
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.policies.html
  */
 
+const Default = ['log', 'isSocket', 'updateExpiry'];
+const Logged = [...Default, 'isLogin'];
 
 module.exports.policies = {
 
@@ -26,15 +28,15 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  '*': ['log', 'isSocket', 'updateExpiry'],
+  '*': Default,
   
   AuthController: {
-      destroy: ['log', 'isSocket', 'updateExpiry', 'isLogin'],
+      destroy: Logged,
   },
   
   UserController: {
-      find: ['log', 'isSocket', 'updateExpiry', 'isLogin'],
-      update: ['log', 'isSocket', 'updateExpiry', 'isLogin'],
+      find: Logged,
+      update: Logged,
   }
 
   /***************************************************************************
