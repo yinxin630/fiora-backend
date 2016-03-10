@@ -24,6 +24,10 @@ module.exports = {
     find: function (option, res) {
         Co(function* () {
             let comments = yield Comment.find({sort: 'createdAt DESC'}).populate('from').limit(30);
+            for (let comment of comments) {
+                delete comment.from.password;
+            }
+            
             res.ok(comments);
         }).catch(err => {
             sails.log.err(err);

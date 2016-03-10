@@ -12,5 +12,5 @@ module.exports = function assert (data, options) {
   // Log request 
   LogRequest(req, res);
   
-  return res.jsonx();
+  return res.jsonx(data);
 };

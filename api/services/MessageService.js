@@ -21,6 +21,7 @@ module.exports = {
             });
             
             let messageResult = yield Message.findOne(message).populate('from').populate('toGroup');
+            delete messageResult.from.password;
             sails.sockets.broadcast(option.to, 'message', messageResult);
             
             res.ok(messageResult);

@@ -13,8 +13,7 @@ module.exports = {
             if (option.token) {
                 let auth = yield Auth.findOne({token: option.token});
                 
-                if (auth && auth.expiry > new Date().getTime()) {
-                    sails.log('token 有效');
+                if (auth) {
                     return res.created(auth);
                 }
             }
@@ -51,7 +50,7 @@ module.exports = {
             let auth = yield Auth.destroy({token: option.token});
             Assert(auth.length !== 0, res, 400, 'please login first');
             
-            res.deleted();
+            res.deleted({msg: 'logout success'});
         }).catch(err => {
             sails.log.error(err.message);
         });
