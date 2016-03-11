@@ -44,6 +44,12 @@ module.exports = {
     
     destroy: function (req, res) {
         res.notImplement();
+    },
+    
+    guest: function (req, res) {
+        UserService.guest({
+            req: req,
+        }, res);
     }
 };
 

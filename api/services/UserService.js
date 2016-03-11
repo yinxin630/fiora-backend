@@ -74,5 +74,36 @@ module.exports = {
         }).catch(err => {
             sails.log.err(err.message);
         });
+    },
+    
+    guest: function (option, res) {
+        Co(function* () {
+            let groups = yield Group.find().limit(1);
+            let defaultGroup = groups[0];
+            
+            let count = yield Message.count();
+            defaultGroup.messages = yield Message.find({skip: count - 30}).populate('from').populate('toGroup');
+            for (let m of defaultGroup.messages) {
+                delete m.from.password;
+            }
+            
+            sails.sockets.join(option.req, defaultGroup.id, err => {
+                if (err) {
+                    sails.log('加入房间失败 option:', option);
+                }
+            });
+            
+            res.ok({
+                id: 0,
+                username: '',
+                password: '',
+                nickname: '游客',
+                avatar: sails.config.avatar,
+                linkmans: [],
+                groups: [defaultGroup],
+            });
+        }).catch(err => {
+            sails.log.err(err.message);
+        });
     }
 }
