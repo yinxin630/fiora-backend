@@ -37,6 +37,14 @@ module.exports.policies = {
   UserController: {
       find: Logged,
       update: Logged,
+  },
+  
+  MessageController: {
+      create: Logged,
+  },
+  
+  CommentController: {
+      create: Logged,
   }
 
   /***************************************************************************
