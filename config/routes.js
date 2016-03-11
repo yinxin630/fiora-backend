@@ -44,5 +44,6 @@ module.exports.routes = {
   ***************************************************************************/
 
   'GET /guest': 'UserController.guest',
+  'POST /temporary': 'MessageController.temporary',
 
 };

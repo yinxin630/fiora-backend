@@ -28,5 +28,27 @@ module.exports = {
         }).catch(err => {
             sails.log(err.message);
         });
+    },
+    
+    temporary: function (option, res) {
+        Co(function* (){
+            Assert(option.content, res, 400, 'missing content param');
+            
+            option.content = option.content.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
+            
+            let defaultGroups = yield Group.find().limit(1);
+            let message = {
+                from: option.from,
+                toGroup: defaultGroups[0],
+                time: new Date,
+                content: option.content,
+            };
+            
+            sails.sockets.broadcast(defaultGroups[0].id, 'message', message);
+            
+            res.ok(message);
+        }).catch(err => {
+            sails.log(err.message);
+        });
     }
 }

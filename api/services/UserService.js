@@ -94,7 +94,7 @@ module.exports = {
             });
             
             res.ok({
-                id: 0,
+                id: 'guest' + Math.floor(Math.random() * 100007),
                 username: '',
                 password: '',
                 nickname: '游客',

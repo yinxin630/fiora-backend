@@ -35,6 +35,16 @@ module.exports = {
     
     destroy: function (req, res) {
         res.notImplement();
+    },
+    
+    temporary: function (req, res) {
+        let from = req.param('from');
+        let content = req.param('content');
+        
+        MessageService.temporary({
+            from: from,
+            content: content,
+        }, res);
     }
 };
 
