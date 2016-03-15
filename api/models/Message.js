@@ -26,6 +26,11 @@ module.exports = {
         
         content: {
             type: 'string',
+        },
+        
+        type: {
+            type: 'string',
+            enum: ['text', 'image'],
         }
     }
 };

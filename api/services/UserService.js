@@ -3,15 +3,7 @@
 const Bcrypt = require('bcrypt-nodejs');
 const Co = require('co');
 const Assert = require('../utils/assert.js');
-const Qiniu = require('node-qiniu');
-const Base64Image = require('node-base64-image');
-
-Qiniu.config({
-    access_key: 'tzNHpTrZu8Df4LTk_zEYObEfkvX0_FhEPog8_8zI',
-    secret_key: 'c3HgVyWrv9idXCLood-c_33sX8KLZdPD67LDNXlV'
-});
-
-const Bucket = Qiniu.bucket('fiora');
+const Qiniu = require('../utils/qiniu.js');
 
 module.exports = {
     create: function (option, res) {
@@ -74,14 +66,14 @@ module.exports = {
             }
             if (option.avatar && option.avatar !== '') {
                 let imageData = new Buffer(option.avatar.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
-                let saved = yield saveBase64ToImage(imageData);
+                let saved = yield Qiniu.saveBase64ToImage(imageData);
                 if (!saved) {
                     user.avatar = option.avatar;
                     sails.log('save base64 avatar fail');
                 }
                 else {
-                    let delResult = yield deleteFile(`avatar_${user.id}`);
-                    let avatarHref = yield putFile(`avatar_${user.id}`);
+                    let delResult = yield Qiniu.deleteFile(`avatar_${user.id}`);
+                    let avatarHref = yield Qiniu.putFile(`avatar_${user.id}`);
                     user.avatar = avatarHref || option.avatar;
                 }
             }
@@ -125,38 +117,4 @@ module.exports = {
             sails.log.err(err.message);
         });
     }
-}
-
-function saveBase64ToImage(imageData) {
-    return new Promise((resolve, reject) => {
-        Base64Image.base64decoder(imageData, {filename: '.tmp/temp'}, (err, saved) => {
-            if (err) {
-                return reject(false);
-            }
-            return resolve(true);
-        })
-    });
-}
-
-function deleteFile(key) {
-    return new Promise((resolve, reject) => {
-        let avatar = Bucket.key(key);
-        avatar.remove(err => {
-            if (err) {
-                return resolve(false);
-            }
-            return resolve(true);
-        });
-    });
-}
-
-function putFile(key) {
-    return new Promise((resolve, reject) => {
-        Bucket.putFile(key, '.tmp/temp.jpg', (err, reply) => {
-            if (err) {
-                return resolve(undefined);
-            }
-            return resolve(`http://7xrutd.com1.z0.glb.clouddn.com/${reply.key}?v=${Date.now()}`);
-        });
-    });
 }
