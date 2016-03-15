@@ -12,12 +12,14 @@ module.exports = {
         let to = req.param('to');
         let isToGroup = true;
         let content = req.param('content');
+        let type = req.param('type');
         
         MessageService.create({
             from: from,
             to: to,
             isToGroup: isToGroup,
             content: content,
+            type: type,
         }, res);
     },
     
@@ -40,10 +42,12 @@ module.exports = {
     temporary: function (req, res) {
         let from = req.param('from');
         let content = req.param('content');
+        let type = req.param('type');
         
         MessageService.temporary({
             from: from,
             content: content,
+            type: type,
         }, res);
     }
 };

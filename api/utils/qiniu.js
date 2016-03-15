@@ -1,3 +1,5 @@
+'use strict'
+
 const Qiniu = require('node-qiniu');
 const Base64Image = require('node-base64-image');
 
