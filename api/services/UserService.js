@@ -3,6 +3,15 @@
 const Bcrypt = require('bcrypt-nodejs');
 const Co = require('co');
 const Assert = require('../utils/assert.js');
+const Qiniu = require('node-qiniu');
+const Base64Image = require('node-base64-image');
+
+Qiniu.config({
+    access_key: 'tzNHpTrZu8Df4LTk_zEYObEfkvX0_FhEPog8_8zI',
+    secret_key: 'c3HgVyWrv9idXCLood-c_33sX8KLZdPD67LDNXlV'
+});
+
+const Bucket = Qiniu.bucket('fiora');
 
 module.exports = {
     create: function (option, res) {
@@ -64,7 +73,11 @@ module.exports = {
                 user.nickname = option.nickname;
             }
             if (option.avatar && option.avatar !== '') {
-                user.avatar = option.avatar;
+                let imageData = new Buffer(option.avatar.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
+                let saved = yield saveBase64ToImage(imageData);
+                let avatarHref = yield putFile(`avatar_${user.id}`);
+                
+                user.avatar = avatarHref;
             }
             
             user.nickname = user.nickname.slice(0, 8);
@@ -106,4 +119,26 @@ module.exports = {
             sails.log.err(err.message);
         });
     }
+}
+
+function saveBase64ToImage(imageData) {
+    return new Promise((resolve, reject) => {
+        Base64Image.base64decoder(imageData, {filename: '.tmp/temp'}, (err, saved) => {
+            if (err) {
+                return reject(false);
+            }
+            return resolve(true);
+        })
+    });
+}
+
+function putFile(key) {
+    return new Promise((resolve, reject) => {
+        Bucket.putFile(key, '.tmp/temp.jpg', (err, reply) => {
+            if (err) {
+                return reject('');
+            }
+            return resolve('http://7xrutd.com1.z0.glb.clouddn.com/' + reply.key);
+        });
+    });
 }
