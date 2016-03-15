@@ -3,6 +3,8 @@
 const Co = require('co');
 const Assert = require('../utils/assert.js');
 
+const MaxMessageLength = 512;
+
 module.exports = {
     create: function (option, res) {
         Co(function* (){
@@ -17,7 +19,7 @@ module.exports = {
                 from: option.from,
                 toGroup: option.to,
                 time: new Date,
-                content: option.content,
+                content: option.content.slice(0, MaxMessageLength),
             });
             
             let messageResult = yield Message.findOne(message).populate('from').populate('toGroup');
@@ -41,7 +43,7 @@ module.exports = {
                 from: option.from,
                 toGroup: defaultGroups[0],
                 time: new Date,
-                content: option.content,
+                content: option.content.slice(0, MaxMessageLength),
             };
             
             sails.sockets.broadcast(defaultGroups[0].id, 'message', message);
