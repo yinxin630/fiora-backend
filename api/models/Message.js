@@ -31,6 +31,14 @@ module.exports = {
         type: {
             type: 'string',
             enum: ['text', 'image'],
+        },
+        
+        width: {
+            type: 'integer',
+        },
+        
+        height: {
+            type: 'integer',
         }
     }
 };

@@ -14,20 +14,20 @@ module.exports = {
             Assert(option.isToGroup, res, 400, 'missing isToGroup param');
             Assert(option.content, res, 400, 'missing content param');
             
-            option.content = option.content.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
             if (option.type === 'text') {
                 option.content = option.content.slice(0, MaxMessageLength);
+                option.content = option.content.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
             }
             
             if (option.type === 'image') {
-                let imageData = new Buffer(option.content.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
+                let imageData = new Buffer(option.content.image.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
                 let saved = yield Qiniu.saveBase64ToImage(imageData);
                 if (!saved) {
                     sails.log('save base64 avatar fail');
                 }
                 else {
                     let imageHref = yield Qiniu.putFile(`message_${Date.now()}`);
-                    option.content = imageHref || option.content;
+                    option.content.image = imageHref || option.content.image;
                 }
             }
             
@@ -35,8 +35,10 @@ module.exports = {
                 from: option.from,
                 toGroup: option.to,
                 time: new Date,
-                content: option.content,
+                content: option.content.image,
                 type: option.type,
+                width: option.content.width || 0,
+                height: option.content.height || 0,
             });
             
             let messageResult = yield Message.findOne(message).populate('from').populate('toGroup');
@@ -53,9 +55,9 @@ module.exports = {
         Co(function* (){
             Assert(option.content, res, 400, 'missing content param');
             
-            option.content = option.content.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
             if (option.type === 'text') {
                 option.content = option.content.slice(0, MaxMessageLength);
+                option.content = option.content.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
             }
             
             if (option.type === 'image') {
@@ -75,8 +77,10 @@ module.exports = {
                 from: option.from,
                 toGroup: defaultGroups[0],
                 time: new Date,
-                content: option.content,
+                content: option.content.image,
                 type: option.type,
+                width: option.content.width,
+                height: option.content.height,
             };
             
             sails.sockets.broadcast(defaultGroups[0].id, 'message', message);
