@@ -38,7 +38,7 @@ module.exports = {
             delete user.password;
             for (let group of user.groups) {
                 let count = yield Message.count();
-                group.messages = yield Message.find({skip: count - 30}).populate('from').populate('toGroup');
+                group.messages = yield Message.find({sort: 'createdAt'}).skip(count - 30).populate('from').populate('toGroup');
                 for (let m of group.messages) {
                     delete m.from.password;
                 }
