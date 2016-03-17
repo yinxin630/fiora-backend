@@ -72,6 +72,7 @@ module.exports = {
                 }
             }
             
+            option.from.nickname = option.from.nickname + ' (游)';
             let defaultGroups = yield Group.find().limit(1);
             let message = {
                 from: option.from,
