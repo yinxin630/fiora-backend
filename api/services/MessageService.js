@@ -61,14 +61,14 @@ module.exports = {
             }
             
             if (option.type === 'image') {
-                let imageData = new Buffer(option.content.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
+                let imageData = new Buffer(option.content.image.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
                 let saved = yield Qiniu.saveBase64ToImage(imageData);
                 if (!saved) {
                     sails.log('save base64 avatar fail');
                 }
                 else {
                     let imageHref = yield Qiniu.putFile(`guest_message_${Date.now()}`);
-                    option.content = imageHref || option.content;
+                    option.content.image = imageHref || option.content.image;
                 }
             }
             
