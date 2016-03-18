@@ -15,19 +15,29 @@ module.exports = {
             Assert(option.content, res, 400, 'missing content param');
             
             if (option.type === 'text') {
-                option.content = option.content.slice(0, MaxMessageLength);
-                option.content = option.content.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
+                let text = option.content.text;
+                text = text.slice(0, MaxMessageLength);
+                text = text.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
+                
+                option.content = {
+                    text: text,
+                };
             }
             
             if (option.type === 'image') {
-                let imageData = new Buffer(option.content.image.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
+                let image = option.content.image;
+                let imageData = new Buffer(image.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
                 let saved = yield Qiniu.saveBase64ToImage(imageData);
                 if (!saved) {
                     sails.log('save base64 avatar fail');
                 }
                 else {
                     let imageHref = yield Qiniu.putFile(`message_${Date.now()}`);
-                    option.content.image = imageHref || option.content.image;
+                    option.content = {
+                        image: imageHref || image,
+                        width: option.content.width,
+                        height: option.content.height,
+                    };
                 }
             }
             
@@ -35,10 +45,8 @@ module.exports = {
                 from: option.from,
                 toGroup: option.to,
                 time: new Date,
-                content: option.type === 'image' ? option.content.image : option.content,
+                content: option.content,
                 type: option.type,
-                width: option.content.width || 0,
-                height: option.content.height || 0,
             });
             
             let messageResult = yield Message.findOne(message).populate('from').populate('toGroup');
@@ -56,19 +64,29 @@ module.exports = {
             Assert(option.content, res, 400, 'missing content param');
             
             if (option.type === 'text') {
-                option.content = option.content.slice(0, MaxMessageLength);
-                option.content = option.content.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
+                let text = option.content.text;
+                text = text.slice(0, MaxMessageLength);
+                text = text.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
+                
+                option.content = {
+                    text: text,
+                };
             }
             
             if (option.type === 'image') {
-                let imageData = new Buffer(option.content.image.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
+                let image = option.content.image;
+                let imageData = new Buffer(image.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
                 let saved = yield Qiniu.saveBase64ToImage(imageData);
                 if (!saved) {
                     sails.log('save base64 avatar fail');
                 }
                 else {
-                    let imageHref = yield Qiniu.putFile(`guest_message_${Date.now()}`);
-                    option.content.image = imageHref || option.content.image;
+                    let imageHref = yield Qiniu.putFile(`message_${Date.now()}`);
+                    option.content = {
+                        image: imageHref || image,
+                        width: option.content.width,
+                        height: option.content.height,
+                    };
                 }
             }
             
@@ -78,10 +96,8 @@ module.exports = {
                 from: option.from,
                 toGroup: defaultGroups[0],
                 time: new Date,
-                content: option.type === 'image' ? option.content.image : option.content,
+                content:option.content,
                 type: option.type,
-                width: option.content.width,
-                height: option.content.height,
             };
             
             sails.sockets.broadcast(defaultGroups[0].id, 'message', message);

@@ -25,21 +25,13 @@ module.exports = {
         },
         
         content: {
-            type: 'string',
+            type: 'json',
         },
         
         type: {
             type: 'string',
             enum: ['text', 'image'],
         },
-        
-        width: {
-            type: 'integer',
-        },
-        
-        height: {
-            type: 'integer',
-        }
     }
 };
 
