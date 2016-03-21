@@ -78,7 +78,7 @@ module.exports = {
                 }
             }
             
-            user.nickname = user.nickname.slice(0, 8);
+            user.nickname = user.nickname.slice(0, 12);
             let newUser = yield user.save();
             delete newUser.password;
             res.ok(newUser);
