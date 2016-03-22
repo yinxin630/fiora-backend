@@ -34,6 +34,7 @@ module.exports = {
                 else {
                     let imageHref = yield Qiniu.putFile(`message_${Date.now()}`);
                     option.content = {
+                        text: 'image',
                         image: imageHref || image,
                         width: option.content.width,
                         height: option.content.height,
@@ -83,6 +84,7 @@ module.exports = {
                 else {
                     let imageHref = yield Qiniu.putFile(`message_${Date.now()}`);
                     option.content = {
+                        text: '<image>',
                         image: imageHref || image,
                         width: option.content.width,
                         height: option.content.height,
