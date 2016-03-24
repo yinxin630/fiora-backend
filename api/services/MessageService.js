@@ -56,7 +56,7 @@ module.exports = {
             
             res.ok(messageResult);
         }).catch(err => {
-            sails.log(err.message);
+            sails.log(err);
         });
     },
     
@@ -106,7 +106,7 @@ module.exports = {
             
             res.ok(message);
         }).catch(err => {
-            sails.log(err.message);
+            sails.log(err);
         });
     }
 }

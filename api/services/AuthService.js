@@ -39,7 +39,7 @@ module.exports = {
             
             res.created(newAuth);
         }).catch(err => {
-            sails.log.error(err.message);
+            sails.log.error(err);
         });
     },
     
@@ -52,7 +52,7 @@ module.exports = {
             
             res.deleted({msg: 'logout success'});
         }).catch(err => {
-            sails.log.error(err.message);
+            sails.log.error(err);
         });
     },
     
@@ -65,7 +65,7 @@ module.exports = {
             
             res.ok(auth);
         }).catch(err => {
-            sails.log.error(err.message);
+            sails.log.error(err);
         });
     }
 }

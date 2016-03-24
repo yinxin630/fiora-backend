@@ -25,7 +25,7 @@ module.exports = {
             delete user.password;
             res.created(user);
         }).catch(err => {
-            sails.log.error(err.message);
+            sails.log.error(err);
             
             let recordExists = err.message.match(/A record with that .* already exists/);
             Assert(recordExists === null, res, 400, recordExists.toString());
@@ -54,7 +54,7 @@ module.exports = {
             
             res.ok(user);
         }).catch(err => {
-            sails.log.err(err.message);
+            sails.log.err(err);
         });
     },
     
@@ -83,7 +83,7 @@ module.exports = {
             delete newUser.password;
             res.ok(newUser);
         }).catch(err => {
-            sails.log.err(err.message);
+            sails.log.err(err);
         });
     },
     
@@ -114,7 +114,7 @@ module.exports = {
                 groups: [defaultGroup],
             });
         }).catch(err => {
-            sails.log.err(err.message);
+            sails.log.err(err);
         });
     }
 }
