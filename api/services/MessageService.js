@@ -14,33 +14,7 @@ module.exports = {
             Assert(option.isToGroup, res, 400, 'missing isToGroup param');
             Assert(option.content, res, 400, 'missing content param');
             
-            if (option.type === 'text') {
-                let text = option.content.text;
-                text = text.slice(0, MaxMessageLength);
-                text = text.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
-                
-                option.content = {
-                    text: text,
-                };
-            }
-            
-            if (option.type === 'image') {
-                let image = option.content.image;
-                let imageData = new Buffer(image.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
-                let saved = yield Qiniu.saveBase64ToImage(imageData);
-                if (!saved) {
-                    sails.log('save base64 avatar fail');
-                }
-                else {
-                    let imageHref = yield Qiniu.putFile(`message_${Date.now()}`);
-                    option.content = {
-                        text: 'image',
-                        image: imageHref || image,
-                        width: option.content.width,
-                        height: option.content.height,
-                    };
-                }
-            }
+            option.content = yield handleContent(option.type, option.content);
             
             let message = yield Message.create({
                 from: option.from,
@@ -64,33 +38,7 @@ module.exports = {
         Co(function* (){
             Assert(option.content, res, 400, 'missing content param');
             
-            if (option.type === 'text') {
-                let text = option.content.text;
-                text = text.slice(0, MaxMessageLength);
-                text = text.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
-                
-                option.content = {
-                    text: text,
-                };
-            }
-            
-            if (option.type === 'image') {
-                let image = option.content.image;
-                let imageData = new Buffer(image.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
-                let saved = yield Qiniu.saveBase64ToImage(imageData);
-                if (!saved) {
-                    sails.log('save base64 avatar fail');
-                }
-                else {
-                    let imageHref = yield Qiniu.putFile(`message_${Date.now()}`);
-                    option.content = {
-                        text: '<image>',
-                        image: imageHref || image,
-                        width: option.content.width,
-                        height: option.content.height,
-                    };
-                }
-            }
+            option.content = yield handleContent(option.type, option.content);
             
             option.from.nickname = option.from.nickname + ' (游)';
             let defaultGroups = yield Group.find().limit(1);
@@ -108,5 +56,45 @@ module.exports = {
         }).catch(err => {
             sails.log(err);
         });
+    }
+}
+
+function* handleContent(type, content) {
+    if (type === 'text') {
+        let text = content.text;
+        text = text.slice(0, MaxMessageLength);
+        text = text.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
+        
+        return {
+            text: text,
+        };
+    }
+    
+    if (type === 'image') {
+        if (content.image.startsWith('http')) {
+            return {
+                text: 'image',
+                image: content.image,
+                width: content.width,
+                height: content.height,
+            };
+        }
+        else {
+            let image = content.image;
+            let imageData = new Buffer(image.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
+            let saved = yield Qiniu.saveBase64ToImage(imageData);
+            if (!saved) {
+                sails.log('save base64 avatar fail');
+            }
+            else {
+                let imageHref = yield Qiniu.putFile(`message_${Date.now()}`);
+                return {
+                    text: 'image',
+                    image: imageHref || image,
+                    width: content.width,
+                    height: content.height,
+                };
+            }
+        }
     }
 }
