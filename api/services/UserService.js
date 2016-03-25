@@ -93,7 +93,7 @@ module.exports = {
             let defaultGroup = groups[0];
             
             let count = yield Message.count();
-            defaultGroup.messages = yield Message.find({skip: count - 30}).populate('from').populate('toGroup');
+            defaultGroup.messages = yield Message.find({sort: 'createdAt'}).skip(count - 30).populate('from').populate('toGroup');
             for (let m of defaultGroup.messages) {
                 delete m.from.password;
             }
