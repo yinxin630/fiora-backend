@@ -21,50 +21,45 @@ const Logged = [...Default, 'isLogin'];
 
 module.exports.policies = {
 
-  /***************************************************************************
-  *                                                                          *
-  * Default policy for all controllers and actions (`true` allows public     *
-  * access)                                                                  *
-  *                                                                          *
-  ***************************************************************************/
+    /***************************************************************************
+    *                                                                          *
+    * Default policy for all controllers and actions (`true` allows public     *
+    * access)                                                                  *
+    *                                                                          *
+    ***************************************************************************/
 
-  '*': Default,
-  
-  AuthController: {
-      destroy: Logged,
-  },
-  
-  UserController: {
-      find: Logged,
-      update: Logged,
-  },
-  
-  MessageController: {
-      create: Logged,
-  },
-  
-  CommentController: {
-      create: Logged,
-  }
+    '*': Default,
 
-  /***************************************************************************
-  *                                                                          *
-  * Here's an example of mapping some policies to run before a controller    *
-  * and its actions                                                          *
-  *                                                                          *
-  ***************************************************************************/
-	// RabbitController: {
+    AuthController: {
+        destroy: Logged
+    },
 
-		// Apply the `false` policy as the default for all of RabbitController's actions
-		// (`false` prevents all access, which ensures that nothing bad happens to our rabbits)
-		// '*': false,
+    UserController: {
+        update: Logged
+    },
 
-		// For the action `nurture`, apply the 'isRabbitMother' policy
-		// (this overrides `false` above)
-		// nurture	: 'isRabbitMother',
+    CommentController: {
+        create: Logged
+    }
 
-		// Apply the `isNiceToAnimals` AND `hasRabbitFood` policies
-		// before letting any users feed our rabbits
-		// feed : ['isNiceToAnimals', 'hasRabbitFood']
-	// }
+    /***************************************************************************
+    *                                                                          *
+    * Here's an example of mapping some policies to run before a controller    *
+    * and its actions                                                          *
+    *                                                                          *
+    ***************************************************************************/
+    // RabbitController: {
+
+    // Apply the `false` policy as the default for all of RabbitController's actions
+    // (`false` prevents all access, which ensures that nothing bad happens to our rabbits)
+    // '*': false,
+
+    // For the action `nurture`, apply the 'isRabbitMother' policy
+    // (this overrides `false` above)
+    // nurture	: 'isRabbitMother',
+
+    // Apply the `isNiceToAnimals` AND `hasRabbitFood` policies
+    // before letting any users feed our rabbits
+    // feed : ['isNiceToAnimals', 'hasRabbitFood']
+    // }
 };
