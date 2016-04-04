@@ -4,25 +4,20 @@
  * @description :: Server-side logic for managing users
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-'use strict'
+'use strict';
 
 module.exports = {
-	create: function(req, res) {
-        let username = req.param('username');
-        let password = req.param('password');
-        
+    create: function(req, res) {
         UserService.create({
-            username: username,
-            password: password,
+            username: req.param('username'),
+            password: req.param('password')
         }, res);
     },
     
     find: function (req, res) {
-        let userId = req.user;
-        
         UserService.find({
-            req: req,
-            userId: userId,
+            token: req.param('token'),
+            socketId: req.socket
         }, res);
     },
     
@@ -31,25 +26,14 @@ module.exports = {
     },
     
     update: function (req, res) {
-        let userId = req.user;
-        let nickname = req.param('nickname');
-        let avatar = req.param('avatar');
-        
         UserService.update({
-            userId: userId,
-            nickname: nickname,
-            avatar: avatar,
+            userId: req.user,
+            nickname: req.param('nickname'),
+            avatar: req.param('avatar')
         }, res);
     },
     
     destroy: function (req, res) {
         res.notImplement();
-    },
-    
-    guest: function (req, res) {
-        UserService.guest({
-            req: req,
-        }, res);
     }
 };
-

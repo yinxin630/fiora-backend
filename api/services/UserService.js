@@ -4,6 +4,7 @@ const Bcrypt = require('bcrypt-nodejs');
 const Co = require('co');
 const Assert = require('../utils/assert.js');
 const Qiniu = require('../utils/qiniu.js');
+const FilterUser = require('../utils/filterUser.js');
 
 module.exports = {
     create: function (option, res) {
@@ -22,8 +23,7 @@ module.exports = {
                 groups: [defaultGroup],
             });
             
-            delete user.password;
-            res.created(user);
+            res.created({id: user.id});
         }).catch(err => {
             sails.log.error(err);
             
@@ -34,22 +34,14 @@ module.exports = {
     
     find: function (option, res) {
         Co(function* () {
-            let user = yield User.findOne({id: option.userId}).populate('groups').populate('linkmans');
-            delete user.password;
-            for (let group of user.groups) {
-                let count = yield Message.count();
-                group.messages = yield Message.find({sort: 'createdAt'}).skip(count - 30).populate('from').populate('toGroup');
-                for (let m of group.messages) {
-                    delete m.from.password;
-                }
-            }
+            let auth = yield Auth.findOne({token: option.token});
+            let user = undefined;
             
-            for (let room of user.groups) {
-                sails.sockets.join(option.req, room.id, err => {
-                    if (err) {
-                        sails.log('加入房间失败 option:', option);
-                    }
-                });
+            if (!auth) {
+                user = yield getUser(auth.user, option.socketId);
+            }
+            else {
+                user = yield getGuest(option.socketId);
             }
             
             res.ok(user);
@@ -80,41 +72,66 @@ module.exports = {
             
             user.nickname = user.nickname.slice(0, 12);
             let newUser = yield user.save();
-            delete newUser.password;
-            res.ok(newUser);
-        }).catch(err => {
-            sails.log.err(err);
-        });
-    },
-    
-    guest: function (option, res) {
-        Co(function* () {
-            let groups = yield Group.find().limit(1);
-            let defaultGroup = groups[0];
-            
-            let count = yield Message.count();
-            defaultGroup.messages = yield Message.find({sort: 'createdAt'}).skip(count - 30).populate('from').populate('toGroup');
-            for (let m of defaultGroup.messages) {
-                delete m.from.password;
-            }
-            
-            sails.sockets.join(option.req, defaultGroup.id, err => {
-                if (err) {
-                    sails.log('加入房间失败 option:', option);
-                }
-            });
-            
             res.ok({
-                id: 'guest' + Math.floor(Math.random() * 100007),
-                username: '',
-                password: '',
-                nickname: '游客',
-                avatar: sails.config.avatar,
-                linkmans: [],
-                groups: [defaultGroup],
+                nickname: newUser.nickname,
+                avatar: newUser.avatar
             });
         }).catch(err => {
             sails.log.err(err);
         });
     }
+}
+
+function* getUser (userId, socketId) {
+    let user = yield User.findOne({id: userId}).populate('groups').populate('linkmans');
+    
+    for (let group of user.groups) {
+        let count = yield Message.count({toGroup: group.id});
+        group.messages = yield Message.find({toGroup: group.id, sort: 'createdAt'}).skip(count - 30).populate('from').populate('toGroup');
+        for (let m of group.messages) {
+            m.from = FilterUser(m.from);
+        }
+    }
+    
+    for (let room of user.groups) {
+        sails.sockets.join(socketId, room.id, err => {
+            if (err) {
+                sails.log('加入房间失败 socket id:', socketId);
+            }
+        });
+    }
+    
+    return {
+        id: user.id,
+        nickname: user.nickname,
+        avatar: user.avatar,
+        linkmans: user.linkmans,
+        groups: user.groups,
+        socketId: socketId
+    };
+}
+
+function* getGuest (socketId) {
+    let defaultGroup = yield Group.findOne({default: true});
+    
+    let count = yield Message.count();
+    defaultGroup.messages = yield Message.find({toGroup: defaultGroup.id, sort: 'createdAt'}).skip(count - 30).populate('from').populate('toGroup');
+    for (let m of defaultGroup.messages) {
+        m.from = FilterUser(m.from);
+    }
+    
+    sails.sockets.join(socketId, defaultGroup.id, err => {
+        if (err) {
+            sails.log('加入房间失败 socket id:', socketId);
+        }
+    });
+    
+    return {
+        id: 'guest' + Math.floor(Math.random() * 100007),
+        nickname: '游客',
+        avatar: sails.config.avatar,
+        linkmans: [],
+        groups: [defaultGroup],
+        socketId: socketId
+    };
 }
