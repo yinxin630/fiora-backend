@@ -26,12 +26,7 @@ module.exports = {
             
             Assert(Bcrypt.compareSync(option.password, user.password), res, 400, `password not correct`);
             
-            let loggedAuth = yield Auth.findOne({user: user.id});
-            if (loggedAuth) {
-                return res.created(loggedAuth);
-            }
-            
-            let expiry = new Date().getTime() + (1000 * 60 * 60 * 24);
+            let expiry = Date.now() + (1000 * 60 * 60 * 6);
             const token = Crypto.createHmac('sha256', secret).update(option.username + expiry).digest('hex');
             
             let newAuth = yield Auth.create({user: user.id, token: token, expiry: expiry, socket: option.socket.id});
@@ -51,19 +46,6 @@ module.exports = {
             Assert(auth.length !== 0, res, 400, 'please login first');
             
             res.deleted({msg: 'logout success'});
-        }).catch(err => {
-            sails.log.error(err);
-        });
-    },
-    
-    find: function (option, res) {
-        Co(function* () {
-            Assert(option.token, res, 400, 'missing token');
-            
-            let auth = yield Auth.findOne({token: option.token});
-            Assert(auth, res, 400, 'please login first');
-            
-            res.ok(auth);
         }).catch(err => {
             sails.log.error(err);
         });
