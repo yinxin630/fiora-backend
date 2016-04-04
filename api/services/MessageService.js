@@ -1,17 +1,71 @@
-'use strict'
+'use strict';
 
 const Co = require('co');
 const Assert = require('../utils/assert.js');
 const Qiniu = require('../utils/qiniu.js');
+const FilterUser = require('../utils/filterUser.js');
 
 const MaxMessageLength = 512;
 
 module.exports = {
-    create: function (option, res) {
+    guestToGroup: function (option, res) {
         Co(function* (){
             Assert(option.from, res, 400, 'missing from param');
             Assert(option.to, res, 400, 'missing to param');
-            Assert(option.isToGroup, res, 400, 'missing isToGroup param');
+            Assert(option.type, res, 400, 'missing type param');
+            Assert(option.content, res, 400, 'missing content param');
+            
+            option.content = yield handleContent(option.type, option.content);
+            
+            option.from.nickname = option.from.nickname + ' (游)';
+            let defaultGroup = yield Group.findOne({default: true});
+            let message = {
+                from: option.from,
+                toGroup: defaultGroup,
+                time: new Date,
+                content:option.content,
+                type: option.type
+            };
+            
+            sails.sockets.broadcast(defaultGroup.id, 'message', message);
+            
+            res.ok(message);
+        }).catch(err => {
+            sails.log(err);
+        });
+    },
+    
+    guestToPerson: function (option, res) {
+        Co(function* (){
+            Assert(option.from, res, 400, 'missing from param');
+            Assert(option.to, res, 400, 'missing to param');
+            Assert(option.type, res, 400, 'missing type param');
+            Assert(option.content, res, 400, 'missing content param');
+            
+            option.content = yield handleContent(option.type, option.content);
+            
+            option.from.nickname = option.from.nickname + ' (游)';
+            let message = {
+                from: option.from,
+                toUser: option.to,
+                time: new Date,
+                content:option.content,
+                type: option.type
+            };
+            
+            sails.sockets.emit(option.to, 'message', message);
+            
+            res.ok(message);
+        }).catch(err => {
+            sails.log(err);
+        });
+    },
+    
+    userToGroup: function (option, res) {
+        Co(function* (){
+            Assert(option.from, res, 400, 'missing from param');
+            Assert(option.to, res, 400, 'missing to param');
+            Assert(option.type, res, 400, 'missing type param');
             Assert(option.content, res, 400, 'missing content param');
             
             option.content = yield handleContent(option.type, option.content);
@@ -21,36 +75,52 @@ module.exports = {
                 toGroup: option.to,
                 time: new Date,
                 content: option.content,
-                type: option.type,
+                type: option.type
             });
             
-            let messageResult = yield Message.findOne({id: message.id}).populate('from').populate('toGroup');
-            delete messageResult.from.password;
-            sails.sockets.broadcast(option.to, 'message', messageResult);
+            message = yield Message.findOne({id: message.id}).populate('from').populate('toGroup');
+            delete message.from.password;
+            sails.sockets.broadcast(option.to, 'message', message);
             
-            res.ok(messageResult);
+            res.ok(message);
         }).catch(err => {
             sails.log(err);
         });
     },
     
-    temporary: function (option, res) {
+    userToPerson: function (option, res) {
         Co(function* (){
+            Assert(option.from, res, 400, 'missing from param');
+            Assert(option.to, res, 400, 'missing to param');
+            Assert(option.type, res, 400, 'missing type param');
             Assert(option.content, res, 400, 'missing content param');
             
             option.content = yield handleContent(option.type, option.content);
             
-            option.from.nickname = option.from.nickname + ' (游)';
-            let defaultGroups = yield Group.find().limit(1);
-            let message = {
-                from: option.from,
-                toGroup: defaultGroups[0],
-                time: new Date,
-                content:option.content,
-                type: option.type,
-            };
+            let message = undefined;
+            if (option.to.id.startsWith('guest')) {
+                message = {
+                    from: option.from,
+                    toPerson: option.to,
+                    time: new Date,
+                    content: option.content,
+                    type: option.type
+                };
+            }
+            else {
+                message = yield Message.create({
+                    from: option.from,
+                    toPerson: option.to,
+                    time: new Date,
+                    content: option.content,
+                    type: option.type
+                });
+            }
             
-            sails.sockets.broadcast(defaultGroups[0].id, 'message', message);
+            
+            message = yield Message.findOne({id: message.id}).populate('from').populate('toGroup');
+            message.from = FilterUser(message.from);
+            sails.sockets.broadcast(option.to, 'message', message);
             
             res.ok(message);
         }).catch(err => {
@@ -66,7 +136,7 @@ function* handleContent(type, content) {
         text = text.replace(/&/g, '&amp').replace(/\"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\'/g, '&apos;');
         
         return {
-            text: text,
+            text: text
         };
     }
     
@@ -76,7 +146,7 @@ function* handleContent(type, content) {
                 text: 'image',
                 image: content.image,
                 width: content.width,
-                height: content.height,
+                height: content.height
             };
         }
         else {
@@ -92,7 +162,7 @@ function* handleContent(type, content) {
                     text: 'image',
                     image: imageHref || image,
                     width: content.width,
-                    height: content.height,
+                    height: content.height
                 };
             }
         }

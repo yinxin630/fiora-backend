@@ -4,23 +4,36 @@
  * @description :: Server-side logic for managing messages
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-'use strict'
+'use strict';
 
 module.exports = {
-	create: function(req, res) {
-        let from = req.param('from');
-        let to = req.param('to');
-        let isToGroup = true;
-        let content = req.param('content');
-        let type = req.param('type');
+    create: function(req, res) {
+        let isGuest = req.param('isGuest');
+        let isToGroup = req.param('isToGroup');
+        let option = {
+            from: req.param('from'),
+            to: req.param('to'),
+            type: req.param('type'),
+            content: req.param('content'),
+            socketId: req.socket
+        };
         
-        MessageService.create({
-            from: from,
-            to: to,
-            isToGroup: isToGroup,
-            content: content,
-            type: type,
-        }, res);
+        if (isGuest) {
+            if (isToGroup) {
+                return MessageService.guestToGroup(option, res);
+            }
+            else {
+                return MessageService.guestToPerson(option, res);
+            }
+        }
+        else {
+            if (isToGroup) {
+                return MessageService.userToGroup(option, res);
+            }
+            else {
+                return MessageService.userToPerson(option, res);
+            }
+        }
     },
     
     find: function (req, res) {
@@ -37,18 +50,6 @@ module.exports = {
     
     destroy: function (req, res) {
         res.notImplement();
-    },
-    
-    temporary: function (req, res) {
-        let from = req.param('from');
-        let content = req.param('content');
-        let type = req.param('type');
-        
-        MessageService.temporary({
-            from: from,
-            content: content,
-            type: type,
-        }, res);
     }
 };
 
