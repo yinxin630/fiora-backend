@@ -9,11 +9,15 @@ module.exports = {
 
     attributes: {
         nickname: {
-            type: 'string',
+            type: 'string'
         },
         
         avatar: {
-            type: 'string',
+            type: 'string'
+        },
+        
+        default: {
+            type: 'boolean'
         }
     }
 };

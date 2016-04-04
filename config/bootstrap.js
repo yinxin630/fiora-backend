@@ -20,7 +20,7 @@ module.exports.bootstrap = function(cb) {
         if (result.length !== 0) {
             return;
         }
-        Group.create({nickname: 'Fiora', avatar: sails.config.avatar}).then(result => {
+        Group.create({nickname: 'Fiora', avatar: sails.config.avatar, default: true}).then(result => {
             if (result) {
                 return sails.log('创建默认房间:', result);
             }
