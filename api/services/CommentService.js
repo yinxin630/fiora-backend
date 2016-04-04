@@ -1,6 +1,7 @@
-'use strict'
+'use strict';
 
 const Co = require('co');
+const FilterUser = require('../utils/filterUser.js');
 
 module.exports = {
     create: function (option, res) {
@@ -9,28 +10,27 @@ module.exports = {
                 return res.ok({msg: 'no content'});
             }
             
-            let auth = yield Auth.findOne({token: option.token});
             let comment = yield Comment.create({
-                from: auth.user,
+                from: option.user,
                 content: option.content,
-                time: new Date,
+                time: new Date
             });
             res.ok(comment);
         }).catch(err => {
             sails.log.err(err);
-        })
+        });
     },
     
     find: function (option, res) {
         Co(function* () {
             let comments = yield Comment.find({sort: 'createdAt DESC'}).populate('from').limit(30);
             for (let comment of comments) {
-                delete comment.from.password;
+                comment.from = FilterUser(comment.from);
             }
             
             res.ok(comments);
         }).catch(err => {
             sails.log.err(err);
-        })
+        });
     }
 }

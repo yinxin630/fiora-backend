@@ -7,13 +7,10 @@
 'use strict'
 
 module.exports = {
-	create: function(req, res) {
-        let token = req.param('token');
-        let content = req.param('content');
-        
+    create: function(req, res) {
         CommentService.create({
-            token: token,
-            content: content,
+            user: req.user,
+            content: req.param('content')
         }, res);
     },
     
