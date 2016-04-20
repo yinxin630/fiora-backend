@@ -40,7 +40,9 @@ module.exports.policies = {
 
     CommentController: {
         create: Logged
-    }
+    },
+    
+    OnlineController: []
 
     /***************************************************************************
     *                                                                          *

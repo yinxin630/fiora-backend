@@ -2,7 +2,7 @@
 
 1. 发送消息
 policy: default  
-request: `POST /message?token&!isGuest&!isToGroup&!from&!to&!type&!content`
+request: `POST /message?token&!isGuest&!isToGroup&!from&!to&!type&!content`  
 result:  
 
     ```
