@@ -123,7 +123,6 @@ module.exports = {
                 message = yield Message.findOne({id: message.id}).populate('from').populate('toGroup');
             }
             
-            sails.log(message);
             message.from = FilterUser(message.from);
             
             let online = yield Online.findOne({user: option.to});
