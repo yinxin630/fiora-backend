@@ -21,4 +21,4 @@ Fiora聊天室后端
 2. 进入项目目录 `cd fiora-backend`
 3. 安装依赖库 `npm install`
 4. 在`config/commections.js`中配置mongo数据库名, 在`config/env/production.js | development.js`中配置端口号和要使用的数据库连接
-5. 运行项目 `sails lift`
+5. 运行项目 `npm run dev` or `npm run prod`
