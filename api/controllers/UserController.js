@@ -28,7 +28,6 @@ module.exports = {
     update: function (req, res) {
         UserService.update({
             userId: req.user,
-            nickname: req.param('nickname'),
             avatar: req.param('avatar')
         }, res);
     },

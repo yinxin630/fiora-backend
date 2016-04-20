@@ -19,7 +19,7 @@ result:
     ```
     {
         id: ObjectId,
-        nickname: String,
+        username: String,
         avatar: String,
         linkmans: Array,
         groups: Array,
@@ -29,12 +29,12 @@ result:
 
 3. 修改用户信息  
 policy: logged  
-request: `PUT /user?!token&nickname&avatar`  
+request: `PUT /user?!token&avatar`  
 result:
 
     ```
     {
-        nickname: String,
+        username: String,
         avatar: String
     }
     ```

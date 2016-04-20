@@ -17,7 +17,6 @@ module.exports = {
             let user = yield User.create({
                 username: option.username,
                 password: passwordHash,
-                nickname: option.username,
                 avatar: sails.config.avatar,
                 linkmans: [],
                 groups: [defaultGroup],
@@ -54,9 +53,6 @@ module.exports = {
     update: function (option, res) {
         Co(function* () {
             let user = yield User.findOne({id: option.userId});
-            if (option.nickname && option.nickname !== '') {
-                user.nickname = option.nickname;
-            }
             if (option.avatar && option.avatar !== '') {
                 let imageData = new Buffer(option.avatar.replace(/data:([A-Za-z-+\/]+);base64,/, ''), 'base64');
                 let saved = yield Qiniu.saveBase64ToImage(imageData);
@@ -71,10 +67,8 @@ module.exports = {
                 }
             }
             
-            user.nickname = user.nickname.slice(0, 12);
             let newUser = yield user.save();
             res.ok({
-                nickname: newUser.nickname,
                 avatar: newUser.avatar
             });
         }).catch(err => {
@@ -104,7 +98,7 @@ function* getUser (userId, socketId) {
     
     return {
         id: user.id,
-        nickname: user.nickname,
+        username: user.username,
         avatar: user.avatar,
         linkmans: user.linkmans,
         groups: user.groups,
@@ -127,9 +121,10 @@ function* getGuest (socketId) {
         }
     });
     
+    let randomId = Math.floor(Math.random() * 100007);
     return {
-        id: 'guest' + Math.floor(Math.random() * 100007),
-        nickname: '游客',
+        id: 'guest' + randomId,
+        username: '游客' + randomId,
         avatar: sails.config.avatar,
         linkmans: [],
         groups: [defaultGroup],

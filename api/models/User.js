@@ -17,10 +17,6 @@ module.exports = {
             type: 'string',
         },
         
-        nickname: {
-            type: 'string',
-        },
-        
         avatar: {
             type: 'string',
         },

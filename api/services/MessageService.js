@@ -17,7 +17,7 @@ module.exports = {
             
             option.content = yield handleContent(option.type, option.content);
             
-            option.from.nickname = option.from.nickname + ' (游)';
+            option.from.username = option.from.username + ' (游)';
             let defaultGroup = yield Group.findOne({default: true});
             let message = {
                 from: option.from,
@@ -44,7 +44,7 @@ module.exports = {
             
             option.content = yield handleContent(option.type, option.content);
             
-            option.from.nickname = option.from.nickname + ' (游)';
+            option.from.username = option.from.username + ' (游)';
             let message = {
                 from: option.from,
                 toUser: option.to,
@@ -120,10 +120,10 @@ module.exports = {
                     content: option.content,
                     type: option.type
                 });
+                message = yield Message.findOne({id: message.id}).populate('from').populate('toGroup');
             }
             
-            
-            message = yield Message.findOne({id: message.id}).populate('from').populate('toGroup');
+            sails.log(message);
             message.from = FilterUser(message.from);
             
             let online = yield Online.findOne({user: option.to});
