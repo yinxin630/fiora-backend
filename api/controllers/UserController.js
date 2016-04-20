@@ -17,7 +17,7 @@ module.exports = {
     find: function (req, res) {
         UserService.find({
             token: req.param('token'),
-            socketId: req.socket
+            socketId: req.socket.id
         }, res);
     },
     

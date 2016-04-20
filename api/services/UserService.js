@@ -37,12 +37,13 @@ module.exports = {
             let auth = yield Auth.findOne({token: option.token});
             let user = undefined;
             
-            if (!auth) {
+            if (auth) {
                 user = yield getUser(auth.user, option.socketId);
             }
             else {
                 user = yield getGuest(option.socketId);
             }
+            let online = yield Online.create({user: user.id, socket: option.socketId});
             
             res.ok(user);
         }).catch(err => {
@@ -87,7 +88,7 @@ function* getUser (userId, socketId) {
     
     for (let group of user.groups) {
         let count = yield Message.count({toGroup: group.id});
-        group.messages = yield Message.find({toGroup: group.id, sort: 'createdAt'}).skip(count - 30).populate('from').populate('toGroup');
+        group.messages = yield Message.find({toGroup: group.id, sort: 'createdAt'}).skip(count > 30 ? count - 30 : 0).populate('from').populate('toGroup');
         for (let m of group.messages) {
             m.from = FilterUser(m.from);
         }
@@ -114,8 +115,8 @@ function* getUser (userId, socketId) {
 function* getGuest (socketId) {
     let defaultGroup = yield Group.findOne({default: true});
     
-    let count = yield Message.count();
-    defaultGroup.messages = yield Message.find({toGroup: defaultGroup.id, sort: 'createdAt'}).skip(count - 30).populate('from').populate('toGroup');
+    let count = yield Message.count({toGroup: defaultGroup.id});
+    defaultGroup.messages = yield Message.find({toGroup: defaultGroup.id, sort: 'createdAt'}).skip(count > 30 ? count - 30 : 0).populate('from').populate('toGroup');
     for (let m of defaultGroup.messages) {
         m.from = FilterUser(m.from);
     }
