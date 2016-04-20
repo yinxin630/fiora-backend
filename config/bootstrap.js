@@ -16,6 +16,8 @@ module.exports.bootstrap = function(cb) {
         });
     }, 300000);
     
+    Online.destroy({}).then(results => sails.log('清理过期在线用户', results) );
+    
     Group.find({}).then(result => {
         if (result.length !== 0) {
             return;
