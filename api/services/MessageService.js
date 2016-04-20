@@ -53,9 +53,14 @@ module.exports = {
                 type: option.type
             };
             
-            sails.sockets.emit(option.to, 'message', message);
-            
-            res.ok(message);
+            let online = yield Online.findOne({user: option.to});
+            if (online) {
+                sails.sockets.emit(online.socket, 'message', message);
+                return res.ok(message);
+            }
+            else {
+                return res.badRequest({msg: 'user not online'});
+            }
         }).catch(err => {
             sails.log(err);
         });
@@ -69,10 +74,10 @@ module.exports = {
             Assert(option.content, res, 400, 'missing content param');
             
             option.content = yield handleContent(option.type, option.content);
-            
+            let defaultGroup = yield Group.findOne({default: true});
             let message = yield Message.create({
-                from: option.from,
-                toGroup: option.to,
+                from: option.from.id,
+                toGroup: defaultGroup.id,
                 time: new Date,
                 content: option.content,
                 type: option.type
@@ -98,10 +103,10 @@ module.exports = {
             option.content = yield handleContent(option.type, option.content);
             
             let message = undefined;
-            if (option.to.id.startsWith('guest')) {
+            if (option.to.toString().startsWith('guest')) {
                 message = {
                     from: option.from,
-                    toPerson: option.to,
+                    toUser: option.to,
                     time: new Date,
                     content: option.content,
                     type: option.type
@@ -110,7 +115,7 @@ module.exports = {
             else {
                 message = yield Message.create({
                     from: option.from,
-                    toPerson: option.to,
+                    toUser: option.to,
                     time: new Date,
                     content: option.content,
                     type: option.type
@@ -120,9 +125,15 @@ module.exports = {
             
             message = yield Message.findOne({id: message.id}).populate('from').populate('toGroup');
             message.from = FilterUser(message.from);
-            sails.sockets.broadcast(option.to, 'message', message);
             
-            res.ok(message);
+            let online = yield Online.findOne({user: option.to});
+            if (online) {
+                sails.sockets.emit(online.socket, 'message', message);
+                return res.ok(message);
+            }
+            else {
+                return res.badRequest({msg: 'user not online'});
+            }
         }).catch(err => {
             sails.log(err);
         });

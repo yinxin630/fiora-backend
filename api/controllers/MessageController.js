@@ -8,7 +8,7 @@
 
 module.exports = {
     create: function(req, res) {
-        let isGuest = req.param('isGuest');
+        let token = req.param('token');
         let isToGroup = req.param('isToGroup');
         let option = {
             from: req.param('from'),
@@ -18,22 +18,25 @@ module.exports = {
             socketId: req.socket
         };
         
-        if (isGuest) {
-            if (isToGroup) {
-                return MessageService.guestToGroup(option, res);
+        Auth.findOne({token: token}).then(result => {
+            if (result) {
+                
+                if (isToGroup) {
+                    return MessageService.userToGroup(option, res);
+                }
+                else {
+                    return MessageService.userToPerson(option, res);
+                }
             }
             else {
-                return MessageService.guestToPerson(option, res);
+                if (isToGroup) {
+                    return MessageService.guestToGroup(option, res);
+                }
+                else {
+                    return MessageService.guestToPerson(option, res);
+                }
             }
-        }
-        else {
-            if (isToGroup) {
-                return MessageService.userToGroup(option, res);
-            }
-            else {
-                return MessageService.userToPerson(option, res);
-            }
-        }
+        });
     },
     
     find: function (req, res) {
