@@ -5,21 +5,26 @@ const Co = require('co');
 const Assert = require('../utils/assert.js');
 const Qiniu = require('../utils/qiniu.js');
 const FilterUser = require('../utils/filterUser.js');
+const strLength = require('../utils/stringLength.js');
 
 module.exports = {
     create: function (option, res) {
         Co(function* () {
-            Assert(option.username, res, 400, 'missing username param');
-            Assert(option.password, res, 400, 'missing password param');
+            Assert(option.username, res, 400, '请输入用户名');
+            Assert(option.password, res, 400, '请输入密码');
             
-            let defaultGroup = yield Group.find({}).limit(1);
+            option.username = option.username.trim();
+            let length = strLength(option.username);
+            Assert(length > 0 && length < 17, res, 400, '用户名长度错误');
+            
+            let defaultGroup = yield Group.findOne({default: true});
             let passwordHash = Bcrypt.hashSync(option.password, User.salt);
             let user = yield User.create({
                 username: option.username,
                 password: passwordHash,
                 avatar: sails.config.avatar,
                 linkmans: [],
-                groups: [defaultGroup],
+                groups: [defaultGroup]
             });
             
             res.created({id: user.id});
@@ -27,7 +32,7 @@ module.exports = {
             sails.log.error(err);
             
             let recordExists = err.message.match(/A record with that .* already exists/);
-            Assert(recordExists === null, res, 400, recordExists.toString());
+            Assert(recordExists === null, res, 400, '该用户名已存在');
         });
     },
     
@@ -42,7 +47,7 @@ module.exports = {
             else {
                 user = yield getGuest(option.socketId);
             }
-            let online = yield Online.create({user: user.id, socket: option.socketId});
+            yield Online.create({user: user.id, socket: option.socketId});
             
             res.ok(user);
         }).catch(err => {

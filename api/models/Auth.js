@@ -10,7 +10,6 @@ module.exports = {
     attributes: {
         user: {
             model: 'user',
-            unique: true,
         },
         
         token: {
