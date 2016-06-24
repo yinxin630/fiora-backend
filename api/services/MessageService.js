@@ -6,6 +6,12 @@ const Qiniu = require('../utils/qiniu.js');
 const FilterUser = require('../utils/filterUser.js');
 
 const MaxMessageLength = 512;
+const messageFrequencyLimit = 5;
+let messageCount = {};
+
+setInterval(() => {
+    messageCount = {};
+}, 10000);
 
 module.exports = {
     create: function (option, res) {
@@ -14,6 +20,15 @@ module.exports = {
             Assert(option.to, res, 400, 'missing to param');
             Assert(option.type, res, 400, 'missing type param');
             Assert(option.content, res, 400, 'missing content param');
+
+            let userId = option.from.id;
+            if (messageCount[userId] === undefined) {
+                messageCount[userId] = 0;
+            }
+            else {
+                messageCount[userId]++;
+            }
+            Assert(messageCount[userId] < messageFrequencyLimit, res, 400, 'send message too often');
             
             let auth = yield Auth.findOne({token: option.token});
             if (auth) {

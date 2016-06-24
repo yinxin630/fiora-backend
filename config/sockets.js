@@ -106,12 +106,13 @@ module.exports.sockets = {
   * app's security.                                                          *
   *                                                                          *
   ***************************************************************************/
-  // beforeConnect: function(handshake, cb) {
-  //   // `true` allows the connection
-  //   return cb(null, true);
-  //
-  //   // (`false` would reject the connection)
-  // },
+  beforeConnect: function(handshake, cb) {
+    // `true` allows the connection
+    console.log('connected');
+    return cb(null, true);
+  
+    // (`false` would reject the connection)
+  },
 
 
   /***************************************************************************
