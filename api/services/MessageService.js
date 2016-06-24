@@ -5,13 +5,13 @@ const Assert = require('../utils/assert.js');
 const Qiniu = require('../utils/qiniu.js');
 const FilterUser = require('../utils/filterUser.js');
 
-const MaxMessageLength = 512;
+const MaxMessageLength = 128;
 const messageFrequencyLimit = 5;
 let messageCount = {};
 
 setInterval(() => {
     messageCount = {};
-}, 10000);
+}, 30000);
 
 module.exports = {
     create: function (option, res) {
