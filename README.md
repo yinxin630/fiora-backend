@@ -2,6 +2,8 @@
 
 Fiora聊天室后端
 
+本仓库已停止更新, 请移步 `https://github.com/yinxin630/fiora`
+
 ## 技术栈
 
 * 语言: JavaScript ES6, Node.js
